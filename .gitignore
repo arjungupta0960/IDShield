@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Local secrets
+.env
+.streamlit/secrets.toml
+
+# Runtime / local audit data
+audit_logs/*.json
+
+# Generated / temporary files
+*.tmp
+*.temp
+*.log
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local test images / datasets
+# Keep only deliberately selected demo assets in the repository.
+data/*
+
+# Allow a small synthetic demo set if you intentionally commit it:
+# !data/demo/
+# !data/demo/*.png
+# !data/demo/*.jpg
