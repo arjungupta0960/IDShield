@@ -1,8 +1,14 @@
 import io
 
-import face_recognition
 import numpy as np
 from PIL import Image
+
+try:
+    import face_recognition
+    FACE_RECOGNITION_AVAILABLE = True
+except Exception:
+    face_recognition = None
+    FACE_RECOGNITION_AVAILABLE = False
 
 
 def load_image(image_input):
@@ -26,11 +32,17 @@ def load_image(image_input):
 
 
 def detect_faces(image):
+    if not FACE_RECOGNITION_AVAILABLE:
+        return []
+
     image = load_image(image)
     return face_recognition.face_locations(image)
 
 
 def get_face_encoding(image):
+    if not FACE_RECOGNITION_AVAILABLE:
+        return None
+
     image = load_image(image)
     locations = detect_faces(image)
 
@@ -54,6 +66,15 @@ def compare_faces(reference_image, passport_image):
 
     Inputs may be uploaded bytes, PIL images, or numpy arrays.
     """
+
+    if not FACE_RECOGNITION_AVAILABLE:
+        return {
+            "status": "REVIEW",
+            "score": 0.0,
+            "distance": None,
+            "message": "Face verification is unavailable in this deployment."
+        }
+
     reference_encoding = get_face_encoding(reference_image)
     passport_encoding = get_face_encoding(passport_image)
 
@@ -61,6 +82,7 @@ def compare_faces(reference_image, passport_image):
         return {
             "status": "REVIEW",
             "score": 0.0,
+            "distance": None,
             "message": "No face detected in reference image."
         }
 
@@ -68,6 +90,7 @@ def compare_faces(reference_image, passport_image):
         return {
             "status": "REVIEW",
             "score": 0.0,
+            "distance": None,
             "message": "No face detected in passport image."
         }
 

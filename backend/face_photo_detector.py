@@ -1,9 +1,14 @@
 import io
-from typing import Optional, Tuple
 
-import face_recognition
 import numpy as np
 from PIL import Image
+
+try:
+    import face_recognition
+    FACE_RECOGNITION_AVAILABLE = True
+except Exception:
+    face_recognition = None
+    FACE_RECOGNITION_AVAILABLE = False
 
 
 def _to_rgb_array(image_input):
@@ -29,16 +34,18 @@ def detect_document_face(image_input):
     """
     Detect the most prominent face in the uploaded document.
 
-    Returns:
-        {
-            "detected": bool,
-            "count": int,
-            "location": (top, right, bottom, left) | None,
-            "face_image": PIL.Image | None
-        }
-
     This is document-photo detection, not identity verification.
     """
+
+    if not FACE_RECOGNITION_AVAILABLE:
+        return {
+            "detected": False,
+            "count": 0,
+            "location": None,
+            "face_image": None,
+            "available": False
+        }
+
     image = _to_rgb_array(image_input)
     locations = face_recognition.face_locations(image)
 
@@ -47,10 +54,10 @@ def detect_document_face(image_input):
             "detected": False,
             "count": 0,
             "location": None,
-            "face_image": None
+            "face_image": None,
+            "available": True
         }
 
-    # For a passport, the largest detected face is the most useful candidate.
     locations = sorted(
         locations,
         key=lambda box: (box[2] - box[0]) * (box[1] - box[3]),
@@ -61,7 +68,6 @@ def detect_document_face(image_input):
 
     height, width = image.shape[:2]
 
-    # Add a small margin around the detected face.
     margin_y = max(10, int((bottom - top) * 0.25))
     margin_x = max(10, int((right - left) * 0.20))
 
@@ -78,5 +84,6 @@ def detect_document_face(image_input):
         "detected": True,
         "count": len(locations),
         "location": (top, right, bottom, left),
-        "face_image": crop
+        "face_image": crop,
+        "available": True
     }
