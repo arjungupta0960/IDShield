@@ -1,10 +1,16 @@
-# IDShield — AI Document & Identity Screening
+# 🛡️ IDShield — AI Document & Identity Screening
 
 IDShield is an AI-assisted document screening prototype that combines multiple verification signals to assess whether an uploaded identity document should be passed, reviewed, or flagged for further investigation.
 
 The system is designed as a multi-stage screening pipeline rather than relying on a single detection technique.
 
 > **Prototype disclaimer:** IDShield is not an official identity-verification or document-authentication system. Its results are screening signals and can contain false positives or false negatives. Demonstrations should use synthetic or authorized test documents.
+
+---
+
+## 🚀 Live Demo
+
+**[Launch IDShield](https://idshield.streamlit.app/)**
 
 ---
 
@@ -29,7 +35,7 @@ IDShield currently combines:
 
 ---
 
-## Screening pipeline
+## 🧠 Screening pipeline
 
 ```text
                     Uploaded Document
@@ -75,9 +81,9 @@ IDShield currently combines:
 
 ---
 
-## Risk assessment
+## 🎯 Why a multi-signal approach?
 
-The application does not treat one signal as definitive proof of fraud.
+IDShield does not treat one signal as definitive proof of fraud.
 
 Instead, different checks contribute to an overall screening assessment. Examples include:
 
@@ -93,7 +99,7 @@ The resulting assessment is presented as a risk level and supporting risk factor
 
 ---
 
-## Tech stack
+## ⚙️ Tech stack
 
 ### Application
 
@@ -109,30 +115,41 @@ The resulting assessment is presented as a risk level and supporting risk factor
 
 ### Identity verification
 
-- `face-recognition`
-- dlib
+- **OpenCV YuNet** — face detection
+- **OpenCV SFace** — face feature extraction and similarity matching
 
 ### Data & reference checks
 
 - Hugging Face Datasets
 - Synthetic passport reference data
 
+### Image forensics
+
+- Error Level Analysis (ELA)
+- Localized suspicious-region analysis
+
 ### Reporting
 
 - ReportLab
 
-### Version control
+### Version control & deployment
 
-- Git / GitHub
+- Git
+- GitHub
+- Streamlit Cloud
 
 ---
 
-## Project structure
+## 📁 Project structure
 
 ```text
 IDShield/
 │
 ├── app.py
+├── requirements.txt
+├── packages.txt
+├── README.md
+├── UI_DESIGN.md
 │
 ├── backend/
 │   ├── ocr.py
@@ -149,26 +166,31 @@ IDShield/
 │   ├── dashboard.py
 │   └── report_generator.py
 │
+├── models/
+│   ├── face_detection_yunet_2023mar.onnx
+│   └── face_recognition_sface_2021dec.onnx
+│
+├── data/
+│   └── synthetic / authorized test data
+│
+├── audit_logs/
+│   └── local screening records
+│
 ├── test_face_verification.py
 ├── generate_test_passport.py
-├── create_tampered_passport.py
-│
-├── README.md
-├── UI_DESIGN.md
-├── requirements.txt
-└── .gitignore
+└── create_tampered_passport.py
 ```
 
-Local runtime files such as the virtual environment, audit JSON files, and private/test data should not be committed to a public repository.
+> Local runtime files such as the virtual environment, audit JSON files, private documents, and other sensitive test data should not be committed to a public repository.
 
 ---
 
-## Running locally
+## 🛠️ Running locally
 
 ### 1. Clone the repository
 
 ```powershell
-git clone <YOUR_GITHUB_REPOSITORY_URL>
+git clone https://github.com/arjungupta0960/IDShield.git
 cd IDShield
 ```
 
@@ -200,32 +222,114 @@ The Streamlit application will provide the local address in the terminal.
 
 ---
 
-## Typical demo workflow
+## 🧪 Typical demo workflow
 
 1. Open **New Screening**.
-2. Upload a synthetic/test document.
+2. Upload a synthetic or authorized test document.
 3. Start document analysis.
 4. Review the screening summary.
 5. Inspect the risk level and contributing factors.
 6. Review document photograph detection.
-7. Optionally provide a reference photograph for identity comparison.
+7. Optionally provide a reference photograph for face similarity verification.
 8. Open advanced analysis to inspect OCR, MRZ, consistency, and image-integrity results.
 9. Review the audit record.
 10. Generate or inspect the screening report.
+11. Open **Screening Dashboard** to review screening history and exports.
 
 ---
 
-## Testing and synthetic documents
+## 🔬 Testing strategy
 
-The repository includes utilities for creating controlled test documents and a face-verification test script.
+IDShield can be evaluated using synthetic or authorized labelled documents.
 
-These are intended for development and demonstration rather than representing real identity documents.
+Recommended test categories:
 
-For a public repository, only synthetic or explicitly authorized assets should be included.
+### Genuine / Bona-fide documents
+
+Test whether legitimate-looking documents produce appropriately low-risk results.
+
+### Forged / Tampered documents
+
+Test whether manipulated documents generate stronger warning signals.
+
+### Face verification
+
+```text
+Same face       → PASS
+Different face  → FAIL
+Unclear case    → REVIEW
+```
+
+### MRZ testing
+
+Test:
+
+- valid MRZ
+- invalid check digits
+- incorrect passport number
+- incorrect dates
+- visible-field / MRZ inconsistencies
+
+For meaningful evaluation, results should be recorded against known ground-truth labels rather than relying on a single demonstration.
 
 ---
 
-## Limitations
+## 📊 Risk assessment
+
+The risk score is a prototype decision-support mechanism.
+
+Signals may include:
+
+```text
+MRZ validation
+      +
+Document consistency
+      +
+Expiry status
+      +
+Image integrity
+      +
+Face similarity
+      +
+Duplicate detection
+      +
+Reference dataset
+      │
+      ▼
+  Risk Score
+      │
+      ▼
+LOW / MEDIUM / HIGH / CRITICAL
+```
+
+The system is designed to provide **explainable supporting factors** alongside the risk level.
+
+It does not claim that a risk score represents a statistically validated probability of fraud.
+
+---
+
+## 🔐 Privacy and security
+
+IDShield is intended for synthetic or authorized testing.
+
+**Do not upload real passports, government IDs, or private biometric photographs to this public repository.**
+
+Before using a system like this with real identity information, additional controls would be required, including:
+
+- authentication and authorization
+- secure storage
+- encryption
+- controlled access to biometric information
+- retention and deletion policies
+- secure secret management
+- audit and monitoring controls
+- appropriate legal and privacy review
+
+Audit records are intended to contain screening metadata and analysis results rather than the uploaded passport image itself.
+
+---
+
+## ⚠️ Limitations
 
 IDShield is a prototype and has important limitations.
 
@@ -235,7 +339,7 @@ OCR accuracy depends on image quality, document layout, lighting, blur, and text
 
 ### MRZ
 
-The MRZ validation checks structural and check-digit consistency. A mathematically valid MRZ does **not** prove that a passport is genuine.
+MRZ validation checks structure and mathematical check-digit consistency. A mathematically valid MRZ does **not** prove that a passport is genuine.
 
 ### Image integrity
 
@@ -243,7 +347,7 @@ ELA and localized image-error detection are heuristic signals. Compression histo
 
 ### Face verification
 
-Face comparison is sensitive to image quality, cropping, lighting, pose, and the quality of the reference photograph. It should not be treated as definitive identity proof.
+Face similarity is sensitive to image quality, cropping, lighting, pose, and reference-image quality. It indicates similarity between images and should not be treated as definitive identity proof.
 
 ### Duplicate detection
 
@@ -259,44 +363,95 @@ The risk score is a prototype decision-support mechanism. It should not be inter
 
 ---
 
-## Privacy and security
+## 📚 Datasets and references
 
-Do not upload real passports, government IDs, or private biometric photographs to a public GitHub repository.
+### Synthetic Indian Passport Dataset
 
-Before using a system like this with real identity information, additional controls would be required, including:
+Synthetic passport data used for development and testing of the OCR, document parsing, and MRZ workflow.
 
-- authentication and authorization
-- secure storage
-- encryption
-- controlled access to biometric information
-- retention and deletion policies
-- secure secret management
-- audit and monitoring controls
-- appropriate legal and privacy review
+**Dataset:**  
+https://huggingface.co/datasets/ud-synthetic/indian-passports
+
+### SIDTD — Synthetic Dataset of ID and Travel Documents
+
+A research dataset containing bona-fide and forged identity/travel document samples for document-forensics research.
+
+**Dataset:**  
+https://tc11.cvc.uab.es/datasets/SIDTD_1
+
+### OpenCV Zoo
+
+OpenCV Zoo provides the YuNet and SFace models used by IDShield for face detection and face similarity verification.
+
+**Repository:**  
+https://github.com/opencv/opencv_zoo
 
 ---
 
-## Future improvements
+## 🚀 Deployment
+
+IDShield is deployed using Streamlit Cloud.
+
+### Live application
+
+**https://idshield.streamlit.app/**
+
+The deployed application uses:
+
+- Streamlit
+- PaddleOCR / PaddlePaddle
+- OpenCV YuNet
+- OpenCV SFace
+- ONNX face models
+- Synthetic reference data
+- ReportLab
+
+---
+
+## 🔮 Future improvements
 
 Potential next steps include:
 
-- larger and better-labeled document datasets
-- quantitative evaluation across genuine and tampered samples
-- stronger document-layout analysis
-- learned image-forensics models
-- improved face verification evaluation
-- database-backed duplicate detection
-- authenticated multi-user access
-- secure deployment
-- model/version tracking
-- automated evaluation and regression tests
+- [ ] Larger and better-labelled document datasets
+- [ ] Quantitative evaluation across genuine and tampered samples
+- [ ] Confusion matrix, precision, recall, and F1 evaluation
+- [ ] Stronger document-layout analysis
+- [ ] Learned image-forensics models
+- [ ] Improved face-verification evaluation
+- [ ] Database-backed duplicate detection
+- [ ] Authenticated multi-user access
+- [ ] Secure production deployment
+- [ ] Model/version tracking
+- [ ] Automated evaluation and regression tests
 
 ---
 
-## Author
+## 🎓 Project context
+
+IDShield was developed as a hands-on machine-learning and computer-vision project exploring document screening, OCR, image forensics, and identity-similarity analysis.
+
+The project focuses on combining multiple independent signals instead of relying on a single AI prediction.
+
+---
+
+## 👨‍💻 Author
 
 **Arjun Gupta**
 
-BTech Computer Science & Engineering
+BTech — Computer Science & Engineering
 
-This project was developed as a hands-on machine-learning/document-screening portfolio project.
+GitHub:  
+https://github.com/arjungupta0960
+
+LinkedIn:  
+https://www.linkedin.com/in/arjun-gupta-87a34737a/
+
+---
+
+## ⭐ Project
+
+If you find IDShield useful or interesting, consider giving the repository a ⭐ on GitHub.
+
+### Live Demo
+
+**https://idshield.streamlit.app/**
