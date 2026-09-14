@@ -3,10 +3,7 @@ paddleocr==3.7.0
 paddlepaddle==3.3.1
 Pillow
 numpy
-opencv-python-headless
+opencv-contrib-python-headless==4.10.0.84
 datasets
 huggingface_hub
 reportlab
-dlib-bin==20.0.0
-face-recognition==1.3.0
-face-recognition-models==0.3.0
