@@ -1,3 +1,7 @@
+import os
+
+os.environ["PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK"] = "True"
+
 import streamlit as st
 from paddleocr import PaddleOCR
 
