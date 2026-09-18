@@ -681,16 +681,9 @@ with st.spinner("Running document screening pipeline..."):
         consistency_results=consistency_results,
         expiry_result=expiry_result,
         tampering_result=tampering_result,
-        face_result=face_result
+        face_result=face_result,
+        duplicate_result=duplicate_result
     )
-
-    # Duplicate detection is an independent screening signal. Keep it outside
-    # the risk_scoring module so older compatible versions of that module work.
-    if duplicate_result.get("matched", False):
-        risk_result["score"] = min(risk_result["score"] + 20, 100)
-        risk_result["reasons"].append(
-            "Similar document image was previously screened."
-        )
 
     # Dataset is a supporting signal, not proof of fraud.
     if dataset_match_result.get("matched") is False:

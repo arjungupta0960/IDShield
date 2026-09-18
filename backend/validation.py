@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 
@@ -318,6 +319,29 @@ def compare_values(document_value, mrz_value):
     return document_value == mrz_value
 
 
+def compare_dates(document_value, mrz_value):
+    """Compare a visible document date with its six-character MRZ date.
+
+    Visible OCR dates are normalized to ``DD.MM.YYYY`` while TD3 MRZ dates
+    use ``YYMMDD``. Comparing their raw strings makes matching dates appear
+    inconsistent and incorrectly increases the risk score.
+    """
+    if not document_value or not mrz_value:
+        return None
+
+    document_match = re.fullmatch(
+        r"(\d{2})[./-](\d{2})[./-](\d{4})",
+        normalize_text(document_value),
+    )
+    mrz_match = re.fullmatch(r"\d{6}", normalize_text(mrz_value))
+
+    if not document_match or not mrz_match:
+        return False
+
+    day, month, year = document_match.groups()
+    return f"{year[-2:]}{month}{day}" == mrz_match.group(0)
+
+
 # ==========================================
 # DOCUMENT CONSISTENCY VALIDATION
 # ==========================================
@@ -353,7 +377,7 @@ def validate_document(
     # Date of Birth
     # --------------------------------------
 
-    results["Date of Birth"] = compare_values(
+    results["Date of Birth"] = compare_dates(
         document_data.get("date_of_birth"),
         mrz_data.get("date_of_birth")
     )
@@ -363,8 +387,8 @@ def validate_document(
     # Expiry Date
     # --------------------------------------
 
-    results["Expiry Date"] = compare_values(
-        document_data.get("expiry_date"),
+    results["Expiry Date"] = compare_dates(
+        document_data.get("date_of_expiry"),
         mrz_data.get("expiry_date")
     )
 

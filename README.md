@@ -149,7 +149,6 @@ IDShield/
 ├── requirements.txt
 ├── packages.txt
 ├── README.md
-├── UI_DESIGN.md
 │
 ├── backend/
 │   ├── ocr.py
@@ -170,18 +169,20 @@ IDShield/
 │   ├── face_detection_yunet_2023mar.onnx
 │   └── face_recognition_sface_2021dec.onnx
 │
-├── data/
-│   └── synthetic / authorized test data
-│
-├── audit_logs/
-│   └── local screening records
-│
 ├── test_face_verification.py
-├── generate_test_passport.py
-└── create_tampered_passport.py
+└── tests/
+    └── test_validation.py
 ```
 
 > Local runtime files such as the virtual environment, audit JSON files, private documents, and other sensitive test data should not be committed to a public repository.
+
+The application creates `audit_logs/` locally after the first screening. Supply
+your own synthetic or authorized images when using the optional manual face
+comparison example:
+
+```powershell
+python test_face_verification.py <reference-image> <document-face-image>
+```
 
 ---
 
