@@ -439,8 +439,6 @@ The project focuses on combining multiple independent signals instead of relying
 
 **Arjun Gupta**
 
-BTech — Computer Science & Engineering
-
 GitHub:  
 https://github.com/arjungupta0960
 
