@@ -1,10 +1,33 @@
 import unittest
 
 from backend.risk_scoring import calculate_risk_score
+from backend.mrz import parse_mrz, validate_mrz_structure
 from backend.validation import validate_document
 
 
 class DocumentValidationTests(unittest.TestCase):
+    def test_known_valid_synthetic_mrz_matches_visible_fields(self):
+        line1 = "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<"
+        line2 = "L898902C36UTO7408122F1204159ZE184226B<<<<<10"
+
+        self.assertTrue(validate_mrz_structure(line1, line2)["valid"])
+        mrz_data = parse_mrz(line1, line2)
+
+        results = validate_document(
+            {
+                "passport_number": "L898902C3",
+                "date_of_birth": "12.08.1974",
+                "date_of_expiry": "15.04.2012",
+                "nationality": "UTO",
+                "sex": "F",
+                "surname": "ERIKSSON",
+                "given_names": "ANNA MARIA",
+            },
+            mrz_data,
+        )
+
+        self.assertTrue(all(value is True for value in results.values()))
+
     def test_visible_dates_match_equivalent_mrz_dates(self):
         results = validate_document(
             {
